@@ -1,0 +1,299 @@
+*dict-popup.txt*  popup for the the dict command
+
+Author:  Neal Joslin
+Repo:    https://github.com/Nealium/dict-popup.nvim
+License: Same terms as Vim itself (see |license|)
+
+                                                *dict-popup*
+==============================================================================
+CONTENTS                                                 *dict-popup-contents*
+
+  Intro                     |dict-popup-intro|
+  Commands                  |dict-popup-commands|
+  Configuration             |dict-popup-configuration|
+  Popup Maps                |dict-popup-popup_maps|
+  Screenshot Colors         |dict-popup-screenshot_colors|
+  Syntax                    |dict-popup-popup_syntax|
+
+==============================================================================
+INTRO                                                         *dict-popup-intro*
+
+A simple plugin for the `dict` command that opens the reponse in a popup
+with sytax styling. Good example words are test, ASCII and ajax
+
+Requires:
+  * dict (Linux specific)
+
+==============================================================================
+COMMANDS                                                   *dict-popup-commands*
+
+:Dict {word}                            *dict-popup-Dict*
+                      Search for {word} in dictonary and generate centered
+                      popup containing the results.
+
+==============================================================================
+CONFIGURATION                                       *dict-popup-configuration*
+
+Lazy.vim https://github.com/folke/lazy.nvim
+
+lua >
+{
+    "https://github.com/Nealium/dict-popup.nvim",
+    config = function()
+        -- Normal mode, current word search 
+        vim.keymap.set("n", "<leader>h", function() Dict(vim.fn.expand("<cword>")) end)
+        -- Visual mode, current selection search 
+        vim.keymap.set("v", "<leader>h", function()
+            vim.cmd('noau normal! "vy"')
+            Dict(vim.fn.getreg('v'))
+        end)
+    end
+}
+<
+
+==============================================================================
+POPUP MAPS                                                *dict-popup-popup_maps*
+
+Key                 Equivalent        Description
+---------------------------------------------------------
+q                                     Close
+<ESC>                                 Close
+---------------------------------------------------------
+
+==============================================================================
+SCREENSHOT COLORS                                       *dict-popup-screenshot_colors*
+
+These are the colors used in the screenshot
+
+hi >
+    vim.api.nvim_set_hl(0, "noMatchesHeader", { fg = "#F7A56E" })
+    vim.api.nvim_set_hl(0, "noMatchesWord", { fg = "#FAF5E5" })
+    vim.api.nvim_set_hl(0, "noMatchesOrigin", { fg = "#ED975E" })
+    vim.api.nvim_set_hl(0, "matchesHeader", { fg = "#F7A56E" })
+    vim.api.nvim_set_hl(0, "matchesCount", { fg = "#F7A56E" })
+    vim.api.nvim_set_hl(0, "matchesLabel", { fg = "#F7A56E" })
+    vim.api.nvim_set_hl(0, "matchesWord", { fg = "#FAF5E5" })
+    vim.api.nvim_set_hl(0, "matchOrigin", { fg = "#ED975E" })
+    vim.api.nvim_set_hl(0, "word", { fg = "#FAF5E5" })
+    vim.api.nvim_set_hl(0, "wordType", { fg = "#FFB380" })
+    vim.api.nvim_set_hl(0, "wordPronounce", { fg = "#E6D499" })
+    vim.api.nvim_set_hl(0, "otherWord", { fg = "#9F9160" })
+    vim.api.nvim_set_hl(0, "jargonOtherWord", { fg = "#9F9160" })
+    vim.api.nvim_set_hl(0, "detailsLabel", { fg = "#F7A56E" })
+    vim.api.nvim_set_hl(0, "detailsKeyword", {
+        fg = "#ED975E",
+        bg = "#3d3a34",
+        italic = true,
+        bold = true,
+    })
+    vim.api.nvim_set_hl(0, "detailsSubLabel", { fg = "#ED975E" })
+    vim.api.nvim_set_hl(0, "textSource", { fg = "#5F5F5F", italic = true })
+    vim.api.nvim_set_hl(0, "quoteSource", { fg = "#9F9160" })
+    vim.api.nvim_set_hl(0, "jargonLabel", { fg = "#f7a56e" })
+<
+
+==============================================================================
+SYNTAX                                                 *dict-popup-popup_syntax*
+
+Headers
+    No Matches ..................... |syntax-no_matches|
+    Matches ........................ |syntax-matches|
+    Match Origin ................... |syntax-matche_origin|
+
+Matches
+    Word ........................... |syntax-word|
+    Other Word ..................... |syntax-other_word|
+    Label .......................... |syntax-label|
+    Keyword ........................ |syntax-keyword|
+    Sub Label ...................... |syntax-sublabel| 
+    Text Source .................... |syntax-text_source|
+    Quote Source ................... |syntax-quote_source|
+
+Jargon Specific
+    Label .......................... |syntax-jargon_label|
+    Other Word ..................... |syntax-jargon_other_word|
+
+
+------------------------------------------------------------------------------
+                                                       *syntax-no_matches*
+
+^No definitions found for "{word}"
+ \-------------------------------|   noMatchesHeader
+                           \----|    NoMatchesWord
+
+
+^gcide:  AA  Ajar  
+ \---------------|                   noMatchesPerhaps
+ \----|                              noMatchesOrigin
+
+------------------------------------------------------------------------------
+                                                       *syntax-matches*
+
+
+^10 definitions found for "{word}"
+ \-------------------------------|   matchesHeader
+ \-|                                 matchesCount
+    \-------------------|            matchesLabel   (**)
+                           \----|    matchesWord    (*)
+
+Notes:
+    (*) groups are text that have been injected in using lua.
+    (**) only has the " for " being injected.
+
+------------------------------------------------------------------------------
+                                                       *syntax-matches_origin*
+
+Group: matchOrigin
+
+^From The Collaborative International Dictionary of English v.0.48 [gcide]:
+ \------------------------------------------------------------------------|
+      
+^From The Jargon File (version 4.4.7, 29 Dec 2003) [jargon]:
+ \---------------------------------------------------------| 
+
+------------------------------------------------------------------------------
+                                                       *syntax-word*
+
+^  Test \Test\, n. [OE. test test, or cupel, potsherd, F. t[^e]t,
+   \--|                                                            word
+        \----|                                                     wordPronounce
+                ||                                                 wordType
+
+
+^  Run \Run\ (r[u^]n), v. i. [imp. {Ran} (r[a^]n) or {Run}; p. p.
+   \-|                                                             word
+       \---|                                                       wordPronounce
+                       ||                                          wordType
+                          ||                                       wordType
+
+
+^  All fours \All` fours"\ [formerly, {All` four"}.]
+   \-------|                                            word
+             \-----------|                              wordPronounce
+
+
+^  ASCII
+   \---|               word
+
+^   /as'kee/, n.
+    \------|           wordPronounce
+              ||       wordType
+
+------------------------------------------------------------------------------
+                                                       *syntax-other_word*
+
+Group: otherWord
+
+^  Run \Run\ (r[u^]n), v. i. [imp. {Ran} (r[a^]n) or {Run}; p. p.
+                                   \---|
+                                                     \---|
+
+^        synonymous with {examination} or {exam}; as, an
+                         \-----------|
+                                          \----|
+
+**Note:** the Jargon dictonary has it's own other word group
+
+------------------------------------------------------------------------------
+                                                       *syntax-label*
+
+Group: detailsLabel
+
+^     1. (Metal.) A cupel or cupelling hearth in which precious
+      ||
+
+^     2. Examination or trial by the cupel; hence, any critical
+      ||
+
+^     {Test act} (Eng. Law), an act of the English Parliament
+      \--------|
+
+**Note:** the Jargon dictonary has it's own label group
+
+------------------------------------------------------------------------------
+                                                       *syntax-keyword*
+
+Group: detailsKeyword
+
+^     Note: The test of crustaceans and insects is composed largely
+      \---|
+
+^     Syn: American Standard Code for Information Interchange.
+      \--|
+
+**Note:** Keywords can be colored differently if using their
+  specific group
+
+  detailsNote   Note
+  detailsSys    Syn
+  detailsUsage  Usage
+
+------------------------------------------------------------------------------
+                                                       *syntax-sublabel*
+
+Group: detailsSubLabel
+
+^        (a) To go swiftly; to pass at a swift pace; to hasten.
+         \-|
+
+
+^        (i) To make numerous drafts or demands for payment, as
+         \-|
+^            upon a bank; -- with on.
+
+^        (j) To creep, as serpents.
+         \-|
+
+------------------------------------------------------------------------------
+                                                       *syntax-text_source*
+
+Group: textSource
+
+^        [1913 Webster]
+         \------------|
+
+^            [1913 Webster]
+             \------------|
+
+^        [PJC]
+         \---|
+
+------------------------------------------------------------------------------
+                                                       *syntax-quote_source*
+
+Group: quoteSource
+
+^              run.                                  --W. Irving.
+                                                     \----------|
+
+^                                                    --Prof.
+^                                                    Wilson.
+                                                     \-----|
+
+------------------------------------------------------------------------------
+                                                       *syntax-jargon_label*
+
+Group: jargonLabel
+
+^      1. A top-centered graphic on a web page. Esp. used in {banner ad}.
+       \|
+
+^      2. On interactive software, a first screen containing a logo and/or author
+       \|
+^      credits and/or a copyright notice. Similar to {splash screen}.
+
+
+------------------------------------------------------------------------------
+                                                       *syntax-jargon_other_word*
+
+Group: jargonLabel
+
+^      1. A top-centered graphic on a web page. Esp. used in {banner ad}.
+                                                             \---------|
+
+^      2. On interactive software, a first screen containing a logo and/or author
+
+^      credits and/or a copyright notice. Similar to {splash screen}.
+                                                     \-------------|
+
+vim:tw=78:ts=8:noet:ft=help:norl:
