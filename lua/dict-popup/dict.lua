@@ -1,6 +1,8 @@
+local dict_internal = {}
+
 ---@param bufnr? integer|nil
 ---@param win_id? integer|nil
-function DestroyDict(bufnr, win_id)
+local function DestroyDict(bufnr, win_id)
     if bufnr ~= nil and vim.api.nvim_buf_is_valid(bufnr) then
         vim.api.nvim_buf_delete(bufnr, { force = true })
     end
@@ -9,8 +11,8 @@ function DestroyDict(bufnr, win_id)
     end
 end
 
----@param word? string
-function Dict(word)
+---@param word string
+function dict_internal:Call(word)
     local output = vim.fn.systemlist({ "dict", word })
 
     -- Inject word in header
@@ -82,11 +84,4 @@ function Dict(word)
     })
 end
 
-vim.api.nvim_create_user_command("Dict", function(opts)
-    local usage = "Usage: :Dict {word (string)}"
-    if not opts.args or not string.len(opts.args) == 2 then
-        print(usage)
-        return
-    end
-    Dict(opts.args)
-end, { nargs = "*" })
+return dict_internal

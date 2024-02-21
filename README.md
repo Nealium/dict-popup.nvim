@@ -1,6 +1,6 @@
 # dict-popup.nvim
 
-A simple plugin for the Linux command `dict` which shows the definitions in a popup.
+A simple plugin for the Linux command `dict` which shows the definitions in a popup.    
 Reworked for Neovim ([vim9script version](https://github.com/Nealium/dict-popup.vim))
 
 ![Screenshot](screenshot.png)
@@ -23,23 +23,23 @@ sudo apt install dict-jargon dict-vera
 * https://github.com/folke/lazy.nvim
 ```lua
 {
-    "https://github.com/Nealium/dict-popup.nvim",
+    "Nealium/dict-popup.nvim",
     config = function()
-        -- Normal mode, current word search 
-        vim.keymap.set("n", "<leader>h", function() Dict(vim.fn.expand("<cword>")) end)
-        -- Visual mode, current selection search 
-        vim.keymap.set("v", "<leader>h", function()
-            vim.cmd('noau normal! "vy"')
-            Dict(vim.fn.getreg('v'))
-        end)
-    end
+        require("dict-popup").setup({
+            normal_mapping = "<Leader>h", -- Search current word
+            visual_mapping = "<Leader>h", -- Search current selection
+            visual_register = "v", -- temp register used in visual
+        })
+    end,
 }
 ```
+**Note:** setting either mapping as `"nil"` (string important) will disable the
+mapping
 
 ## Usage
 ex command `:Dict {word}`, example `:Dict test`    
 
 # TODO
+- [X] Proper config & setup    
 - [ ] Center popup for `:Dict` command    
-- [ ] Proper config & setup    
-- [ ] Highlights in config / set per buffer    k
+- [ ] Highlights in config / set per buffer    
