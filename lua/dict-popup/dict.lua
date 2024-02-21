@@ -12,7 +12,7 @@ local function DestroyDict(bufnr, win_id)
 end
 
 ---@param word string
-function dict_internal:Call(word)
+function dict_internal.Call(word)
     local output = vim.fn.systemlist({ "dict", word })
 
     -- Inject word in header

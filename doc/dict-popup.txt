@@ -36,18 +36,16 @@ CONFIGURATION                                       *dict-popup-configuration*
 
 Lazy.vim https://github.com/folke/lazy.nvim
 
-lua >
+Lazy Config: >
 {
-    "https://github.com/Nealium/dict-popup.nvim",
+    "Nealium/dict-popup.nvim",
     config = function()
-        -- Normal mode, current word search 
-        vim.keymap.set("n", "<leader>h", function() Dict(vim.fn.expand("<cword>")) end)
-        -- Visual mode, current selection search 
-        vim.keymap.set("v", "<leader>h", function()
-            vim.cmd('noau normal! "vy"')
-            Dict(vim.fn.getreg('v'))
-        end)
-    end
+        require("dict-popup").setup({
+            normal_mapping = "<Leader>h", -- Search current word
+            visual_mapping = "<Leader>h", -- Search current selection
+            visual_register = "v", -- temp register used in visual
+        })
+    end,
 }
 <
 
@@ -65,7 +63,7 @@ SCREENSHOT COLORS                                       *dict-popup-screenshot_c
 
 These are the colors used in the screenshot
 
-hi >
+hi: >
     vim.api.nvim_set_hl(0, "noMatchesHeader", { fg = "#F7A56E" })
     vim.api.nvim_set_hl(0, "noMatchesWord", { fg = "#FAF5E5" })
     vim.api.nvim_set_hl(0, "noMatchesOrigin", { fg = "#ED975E" })

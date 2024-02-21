@@ -30,17 +30,17 @@ function dict_popup.setup(options)
     -- User function, called with argument
     vim.api.nvim_create_user_command("Dict", function(opts)
         local usage = "Usage: :Dict {word}"
-        if not opts.args or not string.len(opts.args) == 2 then
+        if not opts.args then
             print(usage)
             return
         end
-        dict:Call(opts.args)
+        dict.Call(opts.args)
     end, { nargs = "*" })
 
     if dict_popup.options.normal_mapping ~= "nil" then
         -- Normal mode, current word search
         vim.keymap.set("n", dict_popup.options.normal_mapping, function()
-            dict:Call(vim.fn.expand("<cword>"))
+            dict.Call(vim.fn.expand("<cword>"))
         end)
     end
 
@@ -50,7 +50,7 @@ function dict_popup.setup(options)
             vim.cmd(
                 'noau normal! "' .. dict_popup.options.visual_register .. 'y"'
             )
-            dict:Call(vim.fn.getreg(dict_popup.options.visual_register))
+            dict.Call(vim.fn.getreg(dict_popup.options.visual_register))
         end)
     end
 end
