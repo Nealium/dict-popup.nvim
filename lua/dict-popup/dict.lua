@@ -1,5 +1,6 @@
 local dict_internal = {}
 
+--- Destroy buffer and window
 ---@param bufnr? integer|nil
 ---@param win_id? integer|nil
 local function DestroyDict(bufnr, win_id)
@@ -11,8 +12,10 @@ local function DestroyDict(bufnr, win_id)
     end
 end
 
+--- SysCall `dict` with given word
 ---@param word string
-function dict_internal.Call(word)
+---@return table
+local function CallDict(word)
     local output = vim.fn.systemlist({ "dict", word })
 
     -- Inject word in header
@@ -20,11 +23,16 @@ function dict_internal.Call(word)
         output[1] = output[1] .. " for " .. '"' .. word .. '"'
     end
 
-    -- Get eventual width
+    return output
+end
+
+--- Calculate width by longest line
+---@param contents table
+---@return number
+local function CalculateWidth(contents)
     local max_line_length = nil
-    for _, line in ipairs(output) do
-        if not string.find(line, "─") then
-            -- ignore tables
+    for _, line in ipairs(contents) do
+        if not string.find(line, "─") then -- ignore tables
             if max_line_length == nil then
                 max_line_length = string.len(line)
             else
@@ -36,38 +44,57 @@ function dict_internal.Call(word)
         end
     end
     -- NOTE: possibly add a "can't be wider than x"?
-    local width = max_line_length
+    return max_line_length or 20
+end
 
-    -- Get height
-    local height = 20
-    if #output < 4 then
-        height = 4
-    elseif #output < 20 then
-        height = #output
+--- Calculate height by table length
+---@param contents table
+---@return number
+local function CalculateHeight(contents)
+    if #contents < 4 then
+        return 4
+    elseif #contents < 20 then
+        return #contents
     end
+    return 20
+end
 
-    -- create buff
+--- Create buffer and set filetype
+---@return number
+local function SetupBuffer()
     local bufnr = vim.api.nvim_create_buf(false, true)
+    vim.api.nvim_set_option_value("filetype", "dict", {
+        buf = bufnr,
+    })
+    return bufnr
+end
 
-    -- set buff contents
-    vim.api.nvim_buf_set_lines(bufnr, 0, -1, true, output)
-
-    local win_id = vim.api.nvim_open_win(bufnr, true, {
-        relative = "cursor",
+--- Create popup window
+---@param bufnr number
+---@param position string
+---@param row number
+---@param col number
+---@param width number
+---@param height number
+---@return number
+local function ShowPopup(bufnr, position, row, col, width, height)
+    return vim.api.nvim_open_win(bufnr, true, {
+        relative = position,
         title = "Dictionary",
         title_pos = "left",
         width = width,
         height = height,
-        row = 0,
-        col = 0,
+        row = row,
+        col = col,
         style = "minimal",
         border = "rounded",
     })
+end
 
-    vim.api.nvim_set_option_value("filetype", "dict", {
-        buf = bufnr,
-    })
-
+--- Setup autocmds and keymmaps
+---@param bufnr number
+---@param win_id number
+local function SetupCmdsAndKeymaps(bufnr, win_id)
     vim.keymap.set("n", "<Esc>", function()
         DestroyDict(bufnr, win_id)
     end, { buffer = bufnr, silent = true })
@@ -82,6 +109,51 @@ function dict_internal.Call(word)
             DestroyDict(bufnr, win_id)
         end,
     })
+end
+
+--- Call `dict` & place popup at cursor
+---@param word string
+function dict_internal.Cursor(word)
+    local contents = CallDict(word)
+    local bufnr = SetupBuffer()
+
+    -- set buff contents
+    vim.api.nvim_buf_set_lines(bufnr, 0, -1, true, contents)
+
+    local win_id = ShowPopup(
+        bufnr,
+        "cursor",
+        1,
+        0,
+        CalculateWidth(contents),
+        CalculateHeight(contents)
+    )
+
+    SetupCmdsAndKeymaps(bufnr, win_id)
+end
+
+--- Call `dict` & place popup at the center
+---@param word string
+function dict_internal.Center(word)
+    local contents = CallDict(word)
+    local bufnr = SetupBuffer()
+
+    -- set buff contents
+    vim.api.nvim_buf_set_lines(bufnr, 0, -1, true, contents)
+
+    local width = CalculateWidth(contents)
+    local height = CalculateHeight(contents)
+
+    local win_id = ShowPopup(
+        bufnr,
+        "editor",
+        math.floor(((vim.o.lines - height) / 2) - 1),
+        math.floor((vim.o.columns - width) / 2),
+        width,
+        height
+    )
+
+    SetupCmdsAndKeymaps(bufnr, win_id)
 end
 
 return dict_internal

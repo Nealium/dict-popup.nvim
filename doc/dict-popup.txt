@@ -39,13 +39,11 @@ Lazy.vim https://github.com/folke/lazy.nvim
 Lazy Config: >
 {
     "Nealium/dict-popup.nvim",
-    config = function()
-        require("dict-popup").setup({
-            normal_mapping = "<Leader>h", -- Search current word
-            visual_mapping = "<Leader>h", -- Search current selection
-            visual_register = "v", -- temp register used in visual
-        })
-    end,
+    opts = {
+        normal_mapping = "<Leader>h",
+        visual_mapping = "<Leader>h",
+        visual_reg = "v",
+    },
 }
 <
 

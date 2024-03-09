@@ -12,6 +12,7 @@ local dict_popup = {}
 ---@field visual_mapping? string
 ---@field visual_register? string
 
+--- Fetch config and defaults
 ---@param options DictPopupPartialConfig
 ---@return DictPopupConfig
 local function with_default(options)
@@ -34,13 +35,13 @@ function dict_popup.setup(options)
             print(usage)
             return
         end
-        dict.Call(opts.args)
+        dict.Center(opts.args)
     end, { nargs = "*" })
 
     if dict_popup.options.normal_mapping ~= "nil" then
         -- Normal mode, current word search
         vim.keymap.set("n", dict_popup.options.normal_mapping, function()
-            dict.Call(vim.fn.expand("<cword>"))
+            dict.Cursor(vim.fn.expand("<cword>"))
         end)
     end
 
@@ -50,9 +51,10 @@ function dict_popup.setup(options)
             vim.cmd(
                 'noau normal! "' .. dict_popup.options.visual_register .. 'y"'
             )
-            dict.Call(vim.fn.getreg(dict_popup.options.visual_register))
+            dict.Cursor(vim.fn.getreg(dict_popup.options.visual_register))
         end)
     end
 end
 
 return dict_popup
+

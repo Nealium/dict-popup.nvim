@@ -24,13 +24,11 @@ sudo apt install dict-jargon dict-vera
 ```lua
 {
     "Nealium/dict-popup.nvim",
-    config = function()
-        require("dict-popup").setup({
-            normal_mapping = "<Leader>h", -- Search current word
-            visual_mapping = "<Leader>h", -- Search current selection
-            visual_register = "v", -- temp register used in visual
-        })
-    end,
+    opts = {
+        normal_mapping = "<Leader>h",
+        visual_mapping = "<Leader>h",
+        visual_reg = "v",
+    },
 }
 ```
 **Note:** setting either mapping as `"nil"` (string important) will disable the
@@ -41,5 +39,7 @@ ex command `:Dict {word}`, example `:Dict test`
 
 # TODO
 - [X] Proper config & setup    
-- [ ] Center popup for `:Dict` command    
-- [ ] Highlights in config / set per buffer    
+- [X] Center popup for `:Dict` command    
+- [ ] Ability to call `dict.Cursor` inside of a dict popup and have it overwrite
+      the current contents    
+- [ ] Colors set in config    
