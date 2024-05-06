@@ -40,6 +40,6 @@ ex command `:Dict {word}`, example `:Dict test`
 # TODO
 - [X] Proper config & setup    
 - [X] Center popup for `:Dict` command    
-- [ ] Ability to call `dict.Cursor` inside of a dict popup and have it overwrite
+- [X] Ability to call `dict.Cursor` inside of a dict popup and have it overwrite
       the current contents    
 - [ ] Colors set in config    
