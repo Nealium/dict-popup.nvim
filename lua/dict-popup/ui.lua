@@ -46,7 +46,8 @@ end
 ---@param col number
 ---@param width number
 ---@param height number
-function DictUI:create_window(buf, position, row, col, width, height)
+---@param stacked? boolean
+function DictUI:create_window(buf, position, row, col, width, height, stacked)
     local win_id = vim.api.nvim_open_win(buf:get_bufnr(), true, {
         relative = position,
         title = "Dictionary",
@@ -61,7 +62,7 @@ function DictUI:create_window(buf, position, row, col, width, height)
 
     -- TODO: add catch for failing to open window
 
-    buf:setup_autocmd_and_keymaps()
+    buf:setup_autocmd_and_keymaps(stacked or false)
 
     self.win_id = win_id
     self.buf = buf

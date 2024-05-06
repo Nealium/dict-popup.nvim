@@ -47,13 +47,22 @@ function DictBuffer:set_contents(contents)
 end
 
 --- Set buffer cmds and maps
-function DictBuffer:setup_autocmd_and_keymaps()
+---@param stacked boolean
+function DictBuffer:setup_autocmd_and_keymaps(stacked)
     vim.keymap.set("n", "<Esc>", function()
         require("dict-popup"):close()
     end, { buffer = self.bufnr, silent = true })
     vim.keymap.set("n", "q", function()
         require("dict-popup"):close()
     end, { buffer = self.bufnr, silent = true })
+
+    if stacked then
+        -- if stacked try to override any "leaving" window events and focus back
+        -- on the centered popup
+        vim.keymap.set("n", "<C-w>", function()
+            require("dict-popup"):close()
+        end, { buffer = self.bufnr, silent = true })
+    end
 
     -- This is important..
     vim.api.nvim_create_autocmd({ "BufLeave" }, {

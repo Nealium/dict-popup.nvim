@@ -28,11 +28,15 @@ sudo apt install dict-jargon dict-vera
         normal_mapping = "<Leader>h",
         visual_mapping = "<Leader>h",
         visual_reg = "v",
+        stack = false,
     },
 }
 ```
-**Note:** setting either mapping as `"nil"` (string important) will disable the
-mapping
+**Notes:**
+* Setting either mapping as `"nil"` (string important) will disable the mapping
+* Settings `stack` to `true` will open up a cursor popup ontop of a center popup
+  instead of the default behavior which is to overwrite the center popup's
+  contents.
 
 ## Usage
 ex command `:Dict {word}`, example `:Dict test`    

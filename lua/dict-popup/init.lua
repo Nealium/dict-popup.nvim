@@ -6,16 +6,19 @@ local Buffer = require("dict-popup.buffer")
 ---@field normal_mapping string
 ---@field visual_mapping string
 ---@field visual_register string
+---@field stack boolean
 
 ---@class DictPopupPartialConfig
 ---@field normal_mapping? string
 ---@field visual_mapping? string
 ---@field visual_register? string
+---@field stack? boolean
 
 ---@class DictInternal
 ---@field cursorUi DictUI
 ---@field centerUi DictUI
 ---@field options DictPopupConfig | nil
+---@field stacked boolean
 local DictInternal = {}
 DictInternal.__index = DictInternal
 
@@ -26,15 +29,25 @@ function DictInternal:new()
         cursorUi = Ui:new(),
         centerUi = Ui:new(),
         options = nil,
+        stacked = false,
     }, self)
 end
 
 --- Close currently shown popup
 function DictInternal:close()
     local bufnr = vim.api.nvim_get_current_buf()
-    if self.cursorUi.buf ~= nil and self.cursorUi.buf.bufnr == bufnr then
+    if self.cursorUi.buf and self.cursorUi.buf:get_bufnr() == bufnr then
         self.cursorUi:close()
-    elseif self.centerUi.buf ~= nil and self.centerUi.buf.bufnr == bufnr then
+        if self.stacked then
+            -- focus onto the centerUi
+            self.stacked = false
+            vim.api.nvim_set_current_win(self.centerUi.win_id)
+        end
+    elseif
+        not self.stacked
+        and self.centerUi.buf
+        and self.centerUi.buf:get_bufnr() == bufnr
+    then
         self.centerUi:close()
     end
 end
@@ -61,9 +74,14 @@ end
 --- Create or update cursor popup, unless a center popup is shown then update it
 ---@param word string
 function DictInternal:cursor(word)
-    if self.centerUi.win_id ~= nil then
+    if not self.options.stack and self.centerUi.win_id ~= nil then
         self:center(word)
     else
+        if self.centerUi.win_id ~= nil then
+            -- flag this cursor is ontop of a center
+            self.stacked = true
+        end
+
         local contents = Utils.CallDict(word)
 
         local width = Utils.CalculateWidth(contents)
@@ -73,7 +91,15 @@ function DictInternal:cursor(word)
         else
             local buf = Buffer:new(contents)
 
-            self.cursorUi:create_window(buf, "cursor", 1, 0, width, height)
+            self.cursorUi:create_window(
+                buf,
+                "cursor",
+                1,
+                0,
+                width,
+                height,
+                self.stacked
+            )
         end
     end
 end
@@ -86,6 +112,7 @@ local function with_default(options)
         normal_mapping = options.normal_mapping or "<Leader>h",
         visual_mapping = options.visual_mapping or "<Leader>h",
         visual_register = options.visual_register or "v",
+        stack = options.stack or false,
     }
 end
 

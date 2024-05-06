@@ -12,7 +12,18 @@
 ## 1.2.0 (2024-05-06)
 
 ### Features
-* Ability to call dict commands inside of a dict popup, overrites contents.
+* Ability to call dict commands inside of a dict popup, overwriting the contents
 
 ### Changes
 * Complete rewrite to be object based
+
+## 1.3.0 (2024-05-06)
+
+### Features
+* Added optional ability to "stack" a cursor popup on top of a center popup,
+  instead of overwriting the contents.
+* New `opts` stack (boolean) [default = false]
+
+### Changes
+* New close keymap for stacked popups `<C-w>` as an attempt to reduce the
+  chances of having the centered popup unfocused
