@@ -27,3 +27,13 @@
 ### Changes
 * New close keymap for stacked popups `<C-w>` as an attempt to reduce the
   chances of having the centered popup unfocused
+
+## 1.4.0 (2024-05-07)
+
+### Features
+* Added search jumplist, ability to go foward and back when calling dict
+  commands inside of a dict popup
+* Next and previous definition jump
+
+### Changes
+* added bufnr to close instead of depending on current buffer

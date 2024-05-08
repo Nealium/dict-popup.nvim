@@ -36,10 +36,23 @@ sudo apt install dict-jargon dict-vera
 * Setting either mapping as `"nil"` (string important) will disable the mapping
 * Settings `stack` to `true` will open up a cursor popup ontop of a center popup
   instead of the default behavior which is to overwrite the center popup's
-  contents.
+  contents. This *may* lead you with the center popup open and unfocused, to
+  refocus do `<C-w><C-w>`
 
 ## Usage
-ex command `:Dict {word}`, example `:Dict test`    
+Contains two versions, cursor and center popup:
+* `normal_mapping` grabs the current word, cursor popup
+* `visual_mapping` grabs the current selecting, cursor popup
+* ex command `:Dict {word}`, center popup
+
+## Dict buffer keymaps
+* `<ESC>` and `q` close popup
+* `}` next definition
+* `{` previous definition
+* `<C-O>` next in search jumplist
+* `<C-I>` and `<TAB>` previous in search jumplist
+* `<C-]>` search current word
+* if stacked, `<C-W>` close popup
 
 # TODO
 - [X] Proper config & setup    

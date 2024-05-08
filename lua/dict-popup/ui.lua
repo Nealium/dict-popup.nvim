@@ -1,7 +1,10 @@
+local Jump = require("dict-popup.jump")
+
 ---@class DictUI
 ---@field win_id? number
 ---@field buf? DictBuffer
 ---@field win_type? string
+---@field jump? DictJump
 local DictUI = {}
 DictUI.__index = DictUI
 
@@ -12,6 +15,7 @@ function DictUI:new()
         win_id = nil,
         buf = nil,
         win_type = nil,
+        jump = Jump:new(),
     }, self)
 end
 
@@ -33,6 +37,7 @@ function DictUI:close()
         vim.api.nvim_win_close(self.win_id, true)
     end
 
+    self.jump:clear()
     self.buf = nil
     self.win_id = nil
     self.win_type = nil

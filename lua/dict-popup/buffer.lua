@@ -50,25 +50,83 @@ end
 ---@param stacked boolean
 function DictBuffer:setup_autocmd_and_keymaps(stacked)
     vim.keymap.set("n", "<Esc>", function()
-        require("dict-popup"):close()
+        require("dict-popup"):close(self.bufnr)
     end, { buffer = self.bufnr, silent = true })
     vim.keymap.set("n", "q", function()
-        require("dict-popup"):close()
+        require("dict-popup"):close(self.bufnr)
+    end, { buffer = self.bufnr, silent = true })
+
+    -- next definition
+    vim.keymap.set("n", "}", function()
+        local file_end = vim.fn.line("$")
+        local counter = vim.fn.line(".") + 1
+        local line_number = nil
+        while counter < file_end do
+            local substring = string.sub(vim.fn.getline(counter), 1, 1)
+            if substring ~= " " and substring ~= "" then
+                line_number = counter
+                break
+            end
+            counter = counter + 1
+        end
+        if line_number then
+            vim.cmd(":" .. line_number)
+        end
+    end, { buffer = self.bufnr, silent = true })
+
+    -- previous definition
+    vim.keymap.set("n", "{", function()
+        local counter = vim.fn.line(".") - 1
+        local line_number = nil
+        while counter > 0 do
+            local substring = string.sub(vim.fn.getline(counter), 1, 1)
+            if substring ~= " " and substring ~= "" then
+                line_number = counter
+                break
+            end
+            counter = counter - 1
+        end
+        if line_number then
+            vim.cmd(":" .. line_number)
+        end
+    end, { buffer = self.bufnr, silent = true })
+
+    vim.keymap.set("n", "<C-o>", function()
+        require("dict-popup"):jump_backwards(self.bufnr)
+    end, { buffer = self.bufnr, silent = true })
+
+    vim.keymap.set("n", "<C-i>", function()
+        require("dict-popup"):jump_forward(self.bufnr)
+    end, { buffer = self.bufnr, silent = true })
+    vim.keymap.set("n", "<Tab>", function()
+        require("dict-popup"):jump_forward(self.bufnr)
+    end, { buffer = self.bufnr, silent = true })
+
+    vim.keymap.set("n", "<C-]>", function()
+        require("dict-popup"):cursor(vim.fn.expand("<cword>"))
+    end, { buffer = self.bufnr, silent = true })
+    vim.keymap.set("v", "<C-]>", function()
+        -- exit visual mode first
+        vim.fn.feedkeys(
+            vim.api.nvim_replace_termcodes("v", false, false, true),
+            "x"
+        )
+        require("dict-popup"):cursor(vim.fn.expand("<cword>"))
     end, { buffer = self.bufnr, silent = true })
 
     if stacked then
         -- if stacked try to override any "leaving" window events and focus back
         -- on the centered popup
         vim.keymap.set("n", "<C-w>", function()
-            require("dict-popup"):close()
+            require("dict-popup"):close(self.bufnr)
         end, { buffer = self.bufnr, silent = true })
     end
 
-    -- This is important..
+    -- This is important.. else <C-W><C-W> is required to refocus
     vim.api.nvim_create_autocmd({ "BufLeave" }, {
         buffer = self.bufnr,
         callback = function()
-            require("dict-popup"):close()
+            require("dict-popup"):close(self.bufnr)
         end,
     })
 end

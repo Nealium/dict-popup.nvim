@@ -34,8 +34,8 @@ function DictInternal:new()
 end
 
 --- Close currently shown popup
-function DictInternal:close()
-    local bufnr = vim.api.nvim_get_current_buf()
+---@param bufnr? integer
+function DictInternal:close(bufnr)
     if self.cursorUi.buf and self.cursorUi.buf:get_bufnr() == bufnr then
         self.cursorUi:close()
         if self.stacked then
@@ -54,7 +54,8 @@ end
 
 --- Create or update center popup
 ---@param word string
-function DictInternal:center(word)
+---@param jump? boolean
+function DictInternal:center(word, jump)
     local contents = Utils.CallDict(word)
 
     local width = Utils.CalculateWidth(contents)
@@ -69,15 +70,19 @@ function DictInternal:center(word)
 
         self.centerUi:create_window(buf, "editor", row, col, width, height)
     end
+    if not jump or false then
+        self.centerUi.jump:add(word)
+    end
 end
 
 --- Create or update cursor popup, unless a center popup is shown then update it
 ---@param word string
-function DictInternal:cursor(word)
+---@param jump? boolean
+function DictInternal:cursor(word, jump)
     if not self.options.stack and self.centerUi.win_id ~= nil then
         self:center(word)
     else
-        if self.centerUi.win_id ~= nil then
+        if self.centerUi:exists() then
             -- flag this cursor is ontop of a center
             self.stacked = true
         end
@@ -100,6 +105,45 @@ function DictInternal:cursor(word)
                 height,
                 self.stacked
             )
+        end
+        if not jump or false then
+            self.cursorUi.jump:add(word)
+        end
+    end
+end
+
+--- Jump forward in jump list
+---@param bufnr integer
+function DictInternal:jump_forward(bufnr)
+    if self.centerUi:exists() and self.centerUi.buf:get_bufnr() == bufnr then
+        local word = self.centerUi.jump:forward()
+        if word ~= nil then
+            self:center(word, true)
+        end
+    elseif
+        self.cursorUi:exists() and self.cursorUi.buf:get_bufnr() == bufnr
+    then
+        local word = self.cursorUi.jump:forward()
+        if word ~= nil then
+            self:cursor(word, true)
+        end
+    end
+end
+
+--- Jump backwards in jump list
+---@param bufnr integer
+function DictInternal:jump_backwards(bufnr)
+    if self.centerUi:exists() and self.centerUi.buf:get_bufnr() == bufnr then
+        local word = self.centerUi.jump:backwards()
+        if word ~= nil then
+            self:center(word, true)
+        end
+    elseif
+        self.cursorUi:exists() and self.cursorUi.buf:get_bufnr() == bufnr
+    then
+        local word = self.cursorUi.jump:backwards()
+        if word ~= nil then
+            self:cursor(word, true)
         end
     end
 end

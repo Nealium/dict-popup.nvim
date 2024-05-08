@@ -61,6 +61,12 @@ Key                 Equivalent        Description
 ---------------------------------------------------------
 q                                     Close
 <ESC>                                 Close
+}                                     Next definition
+{                                     Previous definition
+<C-O>                                 Next search in search jumplist
+<C-I>                                 Previous search in search jumplist
+<TAB>                                 Previous search in search jumplist
+<C-]>                                 Search current word
 <C-W>                                 Close (Nested)
 ---------------------------------------------------------
 
