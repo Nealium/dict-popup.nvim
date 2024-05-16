@@ -20,9 +20,9 @@
 ## 1.3.0 (2024-05-06)
 
 ### Features
-* Added optional ability to "stack" a cursor popup on top of a center popup,
+* Optional ability to "stack" a cursor popup on top of a center popup,
   instead of overwriting the contents.
-* New `opts` stack (boolean) [default = false]
+* `opts` "stack" (boolean) [default = false]
 
 ### Changes
 * New close keymap for stacked popups `<C-w>` as an attempt to reduce the
@@ -36,4 +36,16 @@
 * Next and previous definition jump
 
 ### Changes
-* added bufnr to close instead of depending on current buffer
+* Added bufnr to close instead of depending on current buffer
+
+## 1.4.5 (2024-05-15)
+
+### Features
+* Health check
+
+### Changes
+* Protected call for the `dict` command in case it isn't executable
+* Jumplist splicing was hardcoded to "2" instead of using the current index in
+  the list
+* Proper argument validation for the `:Dict` command
+* All Print statements to use vim.notify instead

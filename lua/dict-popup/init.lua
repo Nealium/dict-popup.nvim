@@ -57,6 +57,9 @@ end
 ---@param jump? boolean
 function DictInternal:center(word, jump)
     local contents = Utils.CallDict(word)
+    if #contents == 0 then
+        return
+    end
 
     local width = Utils.CalculateWidth(contents)
     local height = Utils.CalculateHeight(contents)
@@ -88,6 +91,9 @@ function DictInternal:cursor(word, jump)
         end
 
         local contents = Utils.CallDict(word)
+        if #contents == 0 then
+            return
+        end
 
         local width = Utils.CalculateWidth(contents)
         local height = Utils.CalculateHeight(contents)
@@ -178,9 +184,8 @@ function dict_popup.setup(self, options)
 
     -- User function, called with argument
     vim.api.nvim_create_user_command("Dict", function(opts)
-        local usage = "Usage: :Dict {word}"
-        if not opts.args then
-            print(usage)
+        if opts.args == "" then
+            vim.notify("Usage: :Dict {word}", vim.log.levels.ERROR)
             return
         end
         self:center(opts.args)

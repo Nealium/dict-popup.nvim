@@ -4,14 +4,21 @@ local M = {}
 ---@param word string
 ---@return table<string>
 function M.CallDict(word)
-    local output = vim.fn.systemlist({ "dict", word })
+    local success, response = pcall(function()
+        local output = vim.fn.systemlist({ "dict", word })
 
-    -- Inject word in header
-    if not string.find(output[1], "No") then
-        output[1] = output[1] .. " for " .. '"' .. word .. '"'
+        -- Inject word in header
+        if not string.find(output[1], "No") then
+            output[1] = output[1] .. " for " .. '"' .. word .. '"'
+        end
+
+        return output
+    end)
+    if not success then
+        vim.notify(response, vim.log.levels.ERROR)
+        return {}
     end
-
-    return output
+    return response
 end
 
 --- Calculate width by longest line

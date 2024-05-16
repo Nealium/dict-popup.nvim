@@ -28,8 +28,10 @@ function DictJump:add(word)
         -- splice list
         local tmp = {}
 
-        ---@diagnostic disable-next-line: deprecated
-        for _, v in ipairs({ (table.unpack or unpack)(self.jumps, 1, 2) }) do
+        for _, v in ipairs({
+            ---@diagnostic disable-next-line: deprecated
+            (table.unpack or unpack)(self.jumps, 1, self.current),
+        }) do
             table.insert(tmp, v)
         end
 
