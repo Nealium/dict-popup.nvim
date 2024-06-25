@@ -2,16 +2,26 @@ local Ui = require("dict-popup.ui")
 local Utils = require("dict-popup.utils")
 local Buffer = require("dict-popup.buffer")
 
+---@class DictPopupBufferMappings
+---@field close table<string>
+---@field next_definition table<string>
+---@field previous_definition table<string>
+---@field jump_back table<string>
+---@field jump_forward table<string>
+---@field jump_definition table<string>
+
 ---@class DictPopupConfig
 ---@field normal_mapping string
 ---@field visual_mapping string
 ---@field visual_register string
+---@field buffer_mappings DictPopupBufferMappings
 ---@field stack boolean
 
 ---@class DictPopupPartialConfig
 ---@field normal_mapping? string
 ---@field visual_mapping? string
 ---@field visual_register? string
+---@field buffer_mappings? table
 ---@field stack? boolean
 
 ---@class DictInternal
@@ -71,7 +81,15 @@ function DictInternal:center(word, jump)
     else
         local buf = Buffer:new(contents)
 
-        self.centerUi:create_window(buf, "editor", row, col, width, height)
+        self.centerUi:create_window(
+            buf,
+            "editor",
+            row,
+            col,
+            width,
+            height,
+            self.options.buffer_mappings
+        )
     end
     if not jump or false then
         self.centerUi.jump:add(word)
@@ -109,6 +127,7 @@ function DictInternal:cursor(word, jump)
                 0,
                 width,
                 height,
+                self.options.buffer_mappings,
                 self.stacked
             )
         end
@@ -158,11 +177,36 @@ end
 ---@param options DictPopupPartialConfig
 ---@return DictPopupConfig
 local function with_default(options)
+    local buffer_mappings = {
+        close = { "<Esc>", "q" },
+        next_definition = { "}" },
+        previous_definition = { "{" },
+        jump_back = { "<C-o>" },
+        jump_forward = { "<C-i>", "<Tab>" },
+        jump_definition = { "<C-]>" },
+    }
+    if options.buffer_mappings then
+        buffer_mappings = {
+            close = options.buffer_mappings["close"]
+                or buffer_mappings["close"],
+            next_definition = options.buffer_mappings["next_definition"]
+                or buffer_mappings["next_definition"],
+            previous_definition = options.buffer_mappings["previous_definition"]
+                or buffer_mappings["previous_definition"],
+            jump_back = options.buffer_mappings["jump_back"]
+                or buffer_mappings["jump_back"],
+            jump_forward = options.buffer_mappings["jump_forward"]
+                or buffer_mappings["jump_forward"],
+            jump_definition = options.buffer_mappings["jump_definition"]
+                or buffer_mappings["jump_definition"],
+        }
+    end
     return {
-        normal_mapping = options.normal_mapping or "<Leader>h",
-        visual_mapping = options.visual_mapping or "<Leader>h",
-        visual_register = options.visual_register or "v",
+        normal_mapping = options.normal_mapping,
+        visual_mapping = options.visual_mapping,
+        visual_register = options.visual_register or "*",
         stack = options.stack or false,
+        buffer_mappings = buffer_mappings,
     }
 end
 
@@ -191,14 +235,14 @@ function dict_popup.setup(self, options)
         self:center(opts.args)
     end, { nargs = "*" })
 
-    if self.options.normal_mapping ~= "nil" then
+    if self.options.normal_mapping ~= nil then
         -- Normal mode, current word search
         vim.keymap.set("n", self.options.normal_mapping, function()
             self:cursor(vim.fn.expand("<cword>"))
         end)
     end
 
-    if self.options.visual_mapping ~= "nil" then
+    if self.options.visual_mapping ~= nil then
         -- Visual mode, current selection search
         vim.keymap.set("v", self.options.visual_mapping, function()
             vim.cmd('noau normal! "' .. self.options.visual_register .. 'y"')

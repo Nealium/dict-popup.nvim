@@ -31,7 +31,7 @@
 ## 1.4.0 (2024-05-07)
 
 ### Features
-* Added search jumplist, ability to go foward and back when calling dict
+* Added search jumplist, ability to go forward and back when calling dict
   commands inside of a dict popup
 * Next and previous definition jump
 
@@ -49,3 +49,12 @@
   the list
 * Proper argument validation for the `:Dict` command
 * All Print statements to use vim.notify instead
+
+## 1.4.6 (2024-06-24)
+
+### Changes
+* Removed default `<Leader>h` bindings and is default to `nil` (no mapping)
+* Changed default visual register to `*`
+* Added buffer keymaps to opts under `buffer_mappings`
+* Updated documentation
+* Fixed my horrible spelling (Thanks Typo!)

@@ -1,9 +1,23 @@
+<div align="center">
+
 # dict-popup.nvim
 
-A simple plugin for the Linux command `dict` which shows the definitions in a popup.    
-Reworked for Neovim ([vim9script version](https://github.com/Nealium/dict-popup.vim))
+[![Neovim](https://img.shields.io/badge/NeoVim-%2357A143.svg?&style=for-the-badge&logo=neovim&logoColor=white)](https://neovim.io/)
+[![Lua](https://img.shields.io/badge/lua-%232C2D72.svg?style=for-the-badge&logo=lua&logoColor=white)](https://www.lua.org/)
+
+</div>
+
+A simple plugin for the Linux command `dict` which shows the definitions in a popup. ([vim9script version](https://github.com/Nealium/dict-popup.vim))
 
 ![Screenshot](screenshot.png)
+
+### Features
+* center and cursor popups
+* ex command: `:Dict {word}` (center)
+* normal mode: lookup current word (cursor)
+* visual mode: lookup selection (cursor)
+* `dict` filetype and accompanying syntax
+* in-buffer pseudo jumplist
 
 ## Install
 
@@ -17,7 +31,7 @@ sudo dnf install dictd
 # extra dictionaries
 sudo apt install dict-jargon dict-vera
 ```
-**Note:** Syntax only tested with gcide *(default)*, jargon and vera
+**Note:** Syntax tested with gcide *(default)*, jargon and vera
 
 ### Plugin
 * https://github.com/folke/lazy.nvim
@@ -25,25 +39,21 @@ sudo apt install dict-jargon dict-vera
 {
     "Nealium/dict-popup.nvim",
     opts = {
-        normal_mapping = "<Leader>h",
+        normal_mapping = nil, -- disable
         visual_mapping = "<Leader>h",
-        visual_reg = "v",
+        visual_reg = "*",
         stack = false,
     },
 }
 ```
 **Notes:**
-* Setting either mapping as `"nil"` (string important) will disable the mapping
-* Settings `stack` to `true` will open up a cursor popup ontop of a center popup
+* Setting `normal_mapping` or `visual_mapping` to `nil` (*actual* nil, not a
+  string), or leaving the keys out all together, will disable the mapping.
+* Setting `stack` to `true` will open up a cursor popup on top of a center popup
   instead of the default behavior which is to overwrite the center popup's
   contents. This *may* lead you with the center popup open and unfocused, to
-  refocus do `<C-w><C-w>`
-
-## Usage
-Contains two versions, cursor and center popup:
-* `normal_mapping` grabs the current word, cursor popup
-* `visual_mapping` grabs the current selecting, cursor popup
-* ex command `:Dict {word}`, center popup
+  refocus do `<C-w><C-w>`- in some situations this won't work and you are on
+  your own!
 
 ## Dict buffer keymaps
 * `<ESC>` and `q` close popup
@@ -53,6 +63,27 @@ Contains two versions, cursor and center popup:
 * `<C-I>` and `<TAB>` previous in search jumplist
 * `<C-]>` search current word
 * if stacked, `<C-W>` close popup
+
+Keymaps can be changed through the opts key `buffer_mappings`:
+```lua
+{
+    "Nealium/dict-popup.nvim",
+    opts = {
+        normal_mapping = "<Leader>h",
+        visual_mapping = "<Leader>h",
+        visual_reg = "*",
+        stack = false,
+        buffer_mappings = { -- defaults
+            close = { "<Esc>", "q" },
+            next_definition = { "}" },
+            previous_definition = { "{" },
+            jump_back = { "<C-o>" },
+            jump_forward = { "<C-i>", "<Tab>" },
+            jump_definition = { "<C-]>" },
+        },
+    },
+}
+```
 
 # TODO
 - [X] Proper config & setup    

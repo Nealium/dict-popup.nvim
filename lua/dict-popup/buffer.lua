@@ -47,72 +47,79 @@ function DictBuffer:set_contents(contents)
 end
 
 --- Set buffer cmds and maps
+---@param buffer_mappings DictPopupBufferMappings
 ---@param stacked boolean
-function DictBuffer:setup_autocmd_and_keymaps(stacked)
-    vim.keymap.set("n", "<Esc>", function()
-        require("dict-popup"):close(self.bufnr)
-    end, { buffer = self.bufnr, silent = true })
-    vim.keymap.set("n", "q", function()
-        require("dict-popup"):close(self.bufnr)
-    end, { buffer = self.bufnr, silent = true })
+function DictBuffer:setup_autocmd_and_keymaps(buffer_mappings, stacked)
+    for _, key in ipairs(buffer_mappings["close"]) do
+        vim.keymap.set("n", key, function()
+            require("dict-popup"):close(self.bufnr)
+        end, { buffer = self.bufnr, silent = true })
+    end
 
     -- next definition
-    vim.keymap.set("n", "}", function()
-        local file_end = vim.fn.line("$")
-        local counter = vim.fn.line(".") + 1
-        local line_number = nil
-        while counter < file_end do
-            local substring = string.sub(vim.fn.getline(counter), 1, 1)
-            if substring ~= " " and substring ~= "" then
-                line_number = counter
-                break
+    for _, key in ipairs(buffer_mappings["next_definition"]) do
+        vim.keymap.set("n", key, function()
+            local file_end = vim.fn.line("$")
+            local counter = vim.fn.line(".") + 1
+            local line_number = nil
+            while counter < file_end do
+                local substring = string.sub(vim.fn.getline(counter), 1, 1)
+                if substring ~= " " and substring ~= "" then
+                    line_number = counter
+                    break
+                end
+                counter = counter + 1
             end
-            counter = counter + 1
-        end
-        if line_number then
-            vim.cmd(":" .. line_number)
-        end
-    end, { buffer = self.bufnr, silent = true })
+            if line_number then
+                vim.cmd(":" .. line_number)
+            end
+        end, { buffer = self.bufnr, silent = true })
+    end
 
     -- previous definition
-    vim.keymap.set("n", "{", function()
-        local counter = vim.fn.line(".") - 1
-        local line_number = nil
-        while counter > 0 do
-            local substring = string.sub(vim.fn.getline(counter), 1, 1)
-            if substring ~= " " and substring ~= "" then
-                line_number = counter
-                break
+    for _, key in ipairs(buffer_mappings["previous_definition"]) do
+        vim.keymap.set("n", key, function()
+            local counter = vim.fn.line(".") - 1
+            local line_number = nil
+            while counter > 0 do
+                local substring = string.sub(vim.fn.getline(counter), 1, 1)
+                if substring ~= " " and substring ~= "" then
+                    line_number = counter
+                    break
+                end
+                counter = counter - 1
             end
-            counter = counter - 1
-        end
-        if line_number then
-            vim.cmd(":" .. line_number)
-        end
-    end, { buffer = self.bufnr, silent = true })
+            if line_number then
+                vim.cmd(":" .. line_number)
+            end
+        end, { buffer = self.bufnr, silent = true })
+    end
 
-    vim.keymap.set("n", "<C-o>", function()
-        require("dict-popup"):jump_backwards(self.bufnr)
-    end, { buffer = self.bufnr, silent = true })
+    for _, key in ipairs(buffer_mappings["jump_back"]) do
+        vim.keymap.set("n", key, function()
+            require("dict-popup"):jump_backwards(self.bufnr)
+        end, { buffer = self.bufnr, silent = true })
+    end
 
-    vim.keymap.set("n", "<C-i>", function()
-        require("dict-popup"):jump_forward(self.bufnr)
-    end, { buffer = self.bufnr, silent = true })
-    vim.keymap.set("n", "<Tab>", function()
-        require("dict-popup"):jump_forward(self.bufnr)
-    end, { buffer = self.bufnr, silent = true })
+    for _, key in ipairs(buffer_mappings["jump_forward"]) do
+        vim.keymap.set("n", key, function()
+            require("dict-popup"):jump_forward(self.bufnr)
+        end, { buffer = self.bufnr, silent = true })
+    end
 
-    vim.keymap.set("n", "<C-]>", function()
-        require("dict-popup"):cursor(vim.fn.expand("<cword>"))
-    end, { buffer = self.bufnr, silent = true })
-    vim.keymap.set("v", "<C-]>", function()
-        -- exit visual mode first
-        vim.fn.feedkeys(
-            vim.api.nvim_replace_termcodes("v", false, false, true),
-            "x"
-        )
-        require("dict-popup"):cursor(vim.fn.expand("<cword>"))
-    end, { buffer = self.bufnr, silent = true })
+    for _, key in ipairs(buffer_mappings["jump_definition"]) do
+        vim.keymap.set("n", key, function()
+            require("dict-popup"):cursor(vim.fn.expand("<cword>"))
+        end, { buffer = self.bufnr, silent = true })
+        vim.keymap.set("v", key, function()
+            -- exit visual mode first
+            vim.fn.feedkeys(
+                vim.api.nvim_replace_termcodes("v", false, false, true),
+                "x"
+            )
+            require("dict-popup"):cursor(vim.fn.expand("<cword>"))
+        end, { buffer = self.bufnr, silent = true })
+    end
 
     if stacked then
         -- if stacked try to override any "leaving" window events and focus back

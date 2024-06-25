@@ -18,8 +18,8 @@ CONTENTS                                                 *dict-popup-contents*
 ==============================================================================
 INTRO                                                         *dict-popup-intro*
 
-A simple plugin for the `dict` command that opens the reponse in a popup
-with sytax styling. Good example words are test, ASCII and ajax
+A simple plugin for the `dict` command that opens the response in a popup
+with syntax styling. Good example words are test, ASCII and ajax
 
 Requires:
   * dict (Linux specific)
@@ -28,7 +28,7 @@ Requires:
 COMMANDS                                                   *dict-popup-commands*
 
 :Dict {word}                            *dict-popup-Dict*
-                      Search for {word} in dictonary and generate centered
+                      Search for {word} in dictionary and generate centered
                       popup containing the results.
 
 ==============================================================================
@@ -40,19 +40,22 @@ Lazy Config: >
 {
     "Nealium/dict-popup.nvim",
     opts = {
-        normal_mapping = "<Leader>h",
+        normal_mapping = nil, -- disable
         visual_mapping = "<Leader>h",
-        visual_reg = "v",
+        visual_reg = "*",
         stack = false,
     },
 }
+<
 
 *Notes:*
-* Setting either mapping as `"nil"` (string important) will disable the mapping
-* Settings `stack` to `true` will open up a cursor popup ontop of a center popup
+* Setting `normal_mapping` or `visual_mapping` to `nil` (*actual* nil, not a
+  string), or leaving the keys out all together, will disable the mapping.
+* Setting `stack` to `true` will open up a cursor popup on top of a center popup
   instead of the default behavior which is to overwrite the center popup's
   contents. This *may* lead you with the center popup open and unfocused, to
-  refocus do `<C-w><C-w>`
+  refocus do `<C-w><C-w>`- in some situations this won't work and you are on
+  your own!
 
 ==============================================================================
 POPUP MAPS                                                *dict-popup-popup_maps*
@@ -70,6 +73,25 @@ q                                     Close
 <C-W>                                 Close (Nested)
 ---------------------------------------------------------
 
+Keymaps can be changed through the opts: >
+{
+    "Nealium/dict-popup.nvim",
+    opts = {
+        normal_mapping = "<Leader>h",
+        visual_mapping = "<Leader>h",
+        visual_reg = "*",
+        stack = false,
+        buffer_mappings = { -- defaults
+            close = { "<Esc>", "q" },
+            next_definition = { "}" },
+            previous_definition = { "{" },
+            jump_back = { "<C-o>" },
+            jump_forward = { "<C-i>", "<Tab>" },
+            jump_definition = { "<C-]>" },
+        },
+    },
+}
+<
 ==============================================================================
 SCREENSHOT COLORS                                       *dict-popup-screenshot_colors*
 
@@ -147,8 +169,8 @@ Jargon Specific
                            \----|    matchesWord    (*)
 
 Notes:
-    (*) groups are text that have been injected in using lua.
-    (**) only has the " for " being injected.
+    (*) groups are text that have been injected in using lua
+    (**) " for ", while injected, is excluded from group
 
 ------------------------------------------------------------------------------
                                                        *syntax-matches_origin*
@@ -202,7 +224,7 @@ Group: otherWord
                          \-----------|
                                           \----|
 
-**Note:** the Jargon dictonary has it's own other word group
+**Note:** the Jargon dictionary has it's own other word group
 
 ------------------------------------------------------------------------------
                                                        *syntax-label*
@@ -218,7 +240,7 @@ Group: detailsLabel
 ^     {Test act} (Eng. Law), an act of the English Parliament
       \--------|
 
-**Note:** the Jargon dictonary has it's own label group
+**Note:** the Jargon dictionary has it's own label group
 
 ------------------------------------------------------------------------------
                                                        *syntax-keyword*
